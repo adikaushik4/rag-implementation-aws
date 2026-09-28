@@ -1,0 +1,75 @@
+# This AWS SAM template has been generated from your function's configuration.
+# If your function has one or more triggers, note that the AWS resources
+# associated with these triggers aren't fully specified in this template and
+# include placeholder values. Open this template in AWS Infrastructure Composer
+# or your favorite IDE and modify it to specify a serverless application with
+# other AWS resources.
+#
+# - SAM automatically generates permissions to interact with the resources
+#   defined in this template. If your function needs additional permissions, add
+#   Policies to the AWS::Serverless::Function resource.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model (SAM) template describing your function.
+Resources:
+  retreivallambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures:
+        - x86_64
+      CodeUri: ./src
+      Description: ''
+      Environment:
+        Variables:
+          DB_USER: xxxxx
+          DB_NAME: xxxxx
+          DB_HOST: xxxxx
+          DB_PASSWORD: 
+      EphemeralStorage:
+        Size: 512
+      Handler: lambda_function.lambda_handler
+      Layers:
+        - arn:aws:lambda:ap-south-1:146041104928:layer:psycopg2-layer:1
+        - arn:aws:lambda:ap-south-1:146041104928:layer:pydf-layer:1
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/retreival_lambda
+      MemorySize: 1024
+      PackageType: Zip
+      RecursiveLoop: Terminate
+      Runtime: python3.12
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      SnapStart:
+        ApplyOn: None
+      Tags: {}
+      Timeout: 300
+      Tracing: PassThrough
+      VpcConfig:
+        Ipv6AllowedForDualStack: false
+        SecurityGroupIds:
+          - sg-0a91f89ab79cdc63f
+        SubnetIds:
+          - subnet-
+          - subnet-
+      Events:
+        Trigger1Event:
+          Type: HttpApi
+          Properties:
+            Method: ANY
+            Path: /MyResource
+        Trigger2Event:
+          Type: HttpApi
+          Properties:
+            Method: ANY
+            Path: /MyResource
+        Trigger3Event:
+          Type: HttpApi
+          Properties:
+            Method: ANY
+            Path: /ask
+        Trigger4Event:
+          Type: HttpApi
+          Properties:
+            Method: ANY
+            Path: /MyResource
