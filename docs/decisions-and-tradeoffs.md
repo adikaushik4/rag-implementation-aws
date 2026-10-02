@@ -1,0 +1,23 @@
+Decisions and Tradeoffs
+
+Design decisions made over the course of this project, with the reasoning behind each — consolidated from day-by-day build logs.
+
+Decision	Choice	Why
+Database access during setup	Bastion host + SSM Session Manager, terminated after use	Avoided a permanent NAT Gateway or public RDS endpoint for a one-time schema setup; SSM avoids managing SSH keys or opening inbound ports
+Vector index type	HNSW over IVFFlat	Faster queries, and doesn't require pre-populating the table before building the index — a better fit for incremental ingestion
+Embedding model	Amazon Titan Text Embeddings V2 (1024-dim)	Cheapest Bedrock embedding option; no meaningful quality tradeoff at this project's scale
+Chunking strategy	Word-count based, 500 words with 50-word overlap	Simple and sufficient for portfolio-scale documents; token-based chunking would be more precise but adds complexity without real benefit here
+DB credentials in Lambda	Environment variables, not Secrets Manager	Faster to implement; Secrets Manager would require an additional VPC interface endpoint (added cost and complexity) for a project this size
+Bastion lifecycle	Terminated after schema setup	Not needed for runtime traffic — Lambda reaches RDS directly via security groups; avoids paying for an idle EC2 instance
+Bedrock connectivity from the VPC	Interface VPC endpoint (bedrock-runtime) over a NAT Gateway	Cheaper (~$0.01/hr/AZ vs. NAT's ~$0.045/hr + data), and scoped to only the one service actually needed
+Model access setup	None required for first-party models	AWS retired manual "model access" approval for serverless foundation models as of Sept 29, 2025 — Titan and Nova are auto-enabled, access controlled purely via IAM
+Generation model	Amazon Nova Lite over Anthropic Claude 3 Haiku	Claude is a third-party AWS Marketplace model requiring a separate subscription/billing path; hit an INVALID_PAYMENT_INSTRUMENT block specific to Marketplace billing. Nova Lite is first-party, no Marketplace dependency, same Converse API call shape
+Model invocation method	Converse API over InvokeModel for generation	Provider-agnostic request/response shape — switching generation models required no change to the request format, only the model ID and IAM resource
+IAM scoping for inference profiles	Wildcarded region (bedrock:*::foundation-model/...) rather than pinned to one region	Cross-region inference profiles (like Nova Lite's apac. profile) route calls to whichever destination region is available; a region-pinned policy breaks unpredictably depending on where a given call lands
+Batch ingestion pattern	Per-file invocation instead of one Lambda looping a whole folder	Hit Lambda's 15-minute hard timeout mid-folder on a large PDF. A real production pipeline would use SQS fan-out or Step Functions to parallelize and isolate failures — noted as a known limitation rather than implemented, given the project's scale
+Refusal on unanswerable questions	Kept "say you don't know" in the generation prompt, did not loosen it	pgvector's similarity search always returns the k-nearest chunks with no relevance threshold — generation is the only layer preventing a confidently wrong answer when nothing in the corpus actually covers the question. Loosening this would trade a real improvement (grounded, honest answers) for a cosmetic one
+Front-end hosting	S3 static website hosting over an external host (Netlify, GitHub Pages)	Keeps the entire project — ingestion, compute, AI, storage, and UI — inside one AWS account, consistent with the goal of demonstrating end-to-end AWS ownership
+API authentication	No auth on POST /ask, with a planned stage-level throttle instead	Matches a public portfolio demo's actual need (anyone can try it) rather than adding login infrastructure the project doesn't otherwise require; throttling protects against cost abuse without adding auth complexity
+Debugging approach worth noting
+
+Several issues in this project looked like one bug but were actually two or three independent issues stacked together (see troubleshooting.md for the full account — the API Gateway "Not Found" chain is the clearest example). The approach that worked consistently was isolating one variable at a time: testing a single function call in isolation before wiring it into the full pipeline, switching tools (curl vs. PowerShell's Invoke-WebRequest) to separate a local tooling issue from an actual server-side one, and adding temporary debug logging at the exact point a timeout or error occurred rather than guessing at the whole pipeline.
