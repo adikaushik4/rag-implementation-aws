@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docs Q&A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B1220;
+    --surface: #121A2C;
+    --surface-raised: #182238;
+    --border: #232F48;
+    --text: #E8ECF4;
+    --text-dim: #8B96AC;
+    --accent: #4FD1C5;
+    --accent-dim: #2E8B82;
+    --tag: #F5A623;
+    --error: #E86A6A;
+    --radius: 10px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 64px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  header {
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 0.925rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .config {
+    margin-top: 18px;
+  }
+
+  .config summary {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+  }
+
+  .config summary:hover { color: var(--text); }
+
+  .config-body {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="text"], textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--accent-dim);
+  }
+
+  .config-body button {
+    flex-shrink: 0;
+    background: var(--surface-raised);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0 16px;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+  }
+
+  .config-body button:hover { color: var(--text); }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  textarea#question {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.975rem;
+    min-height: 88px;
+    resize: vertical;
+    line-height: 1.5;
+    padding: 14px 16px;
+  }
+
+  .ask-btn {
+    align-self: flex-start;
+    background: var(--accent);
+    color: #06201D;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 22px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .ask-btn:hover:not(:disabled) { background: #63DBD0; }
+  .ask-btn:active:not(:disabled) { transform: scale(0.98); }
+  .ask-btn:disabled { background: var(--accent-dim); cursor: default; opacity: 0.7; }
+
+  .spinner {
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(6,32,29,0.35);
+    border-top-color: #06201D;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .ask-btn.loading .spinner { display: inline-block; }
+  .ask-btn.loading .btn-label { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #result {
+    margin-top: 28px;
+  }
+
+  .answer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: none;
+  }
+
+  .answer-card.visible { display: block; }
+
+  .answer-text {
+    font-size: 0.975rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+
+  .sources {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .source-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--tag);
+    background: rgba(245, 166, 35, 0.1);
+    border: 1px solid rgba(245, 166, 35, 0.25);
+    border-radius: 5px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+
+  .error-card {
+    background: rgba(232, 106, 106, 0.08);
+    border: 1px solid rgba(232, 106, 106, 0.3);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    color: var(--error);
+    font-size: 0.875rem;
+    display: none;
+    line-height: 1.5;
+  }
+
+  .error-card.visible { display: block; }
+
+  .empty-hint {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 32px 16px 48px; }
+    h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Docs Q&amp;A</h1>
+    <p>Ask a question about the ingested documents. Answers are generated only from retrieved source chunks.</p>
+    <details class="config">
+      <summary>API endpoint</summary>
+      <div class="config-body">
+        <input type="text" id="endpoint" placeholder="https://your-api-id.execute-api.region.amazonaws.com/ask">
+        <button id="saveEndpoint">Save</button>
+      </div>
+    </details>
+  </header>
+
+  <form id="askForm">
+    <textarea id="question" placeholder="e.g. What is the pilot light disaster recovery strategy?" required></textarea>
+    <button type="submit" class="ask-btn" id="submitBtn">
+      <span class="spinner"></span>
+      <span class="btn-label">Ask</span>
+    </button>
+  </form>
+
+  <div id="result">
+    <div class="answer-card" id="answerCard">
+      <p class="answer-text" id="answerText"></p>
+      <div class="sources" id="sources"></div>
+    </div>
+    <div class="error-card" id="errorCard"></div>
+    <p class="empty-hint" id="emptyHint">No question asked yet.</p>
+  </div>
+</main>
+
+<script>
+  const endpointInput = document.getElementById('endpoint');
+  const saveBtn = document.getElementById('saveEndpoint');
+  const form = document.getElementById('askForm');
+  const questionEl = document.getElementById('question');
+  const submitBtn = document.getElementById('submitBtn');
+  const answerCard = document.getElementById('answerCard');
+  const answerText = document.getElementById('answerText');
+  const sourcesEl = document.getElementById('sources');
+  const errorCard = document.getElementById('errorCard');
+  const emptyHint = document.getElementById('emptyHint');
+
+  const DEFAULT_ENDPOINT = 'https://y0arbu2gpg.execute-api.ap-south-1.amazonaws.com/ask';
+
+  try {
+    const saved = localStorage.getItem('ragEndpoint');
+    endpointInput.value = saved || DEFAULT_ENDPOINT;
+  } catch (e) {
+    endpointInput.value = DEFAULT_ENDPOINT;
+  }
+
+  saveBtn.addEventListener('click', () => {
+    try {
+      localStorage.setItem('ragEndpoint', endpointInput.value.trim());
+      saveBtn.textContent = 'Saved';
+      setTimeout(() => { saveBtn.textContent = 'Save'; }, 1200);
+    } catch (e) {
+      saveBtn.textContent = 'Not saved';
+    }
+  });
+
+  function resetPanels() {
+    answerCard.classList.remove('visible');
+    errorCard.classList.remove('visible');
+    emptyHint.style.display = 'none';
+  }
+
+  function showAnswer(answer, sources) {
+    resetPanels();
+    answerText.textContent = answer;
+    sourcesEl.innerHTML = '';
+    (sources || []).forEach(s => {
+      const tag = document.createElement('span');
+      tag.className = 'source-tag';
+      const name = (s.document || '').split('/').pop();
+      tag.textContent = `${name} · chunk ${s.chunk}`;
+      sourcesEl.appendChild(tag);
+    });
+    answerCard.classList.add('visible');
+  }
+
+  function showError(message) {
+    resetPanels();
+    errorCard.textContent = message;
+    errorCard.classList.add('visible');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = questionEl.value.trim();
+    const endpoint = endpointInput.value.trim();
+    if (!question) return;
+    if (!endpoint) {
+      showError('Set an API endpoint above before asking a question.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      const raw = await res.text();
+      let data;
+      try { data = JSON.parse(raw); } catch (parseErr) { data = null; }
+
+      if (!res.ok) {
+        const msg = (data && (data.error || data.message)) || `Request failed (status ${res.status}).`;
+        showError(msg);
+        return;
+      }
+
+      if (data && data.answer) {
+        showAnswer(data.answer, data.sources);
+      } else {
+        showError('The API responded, but the shape was unexpected. Check the console for the raw response.');
+        console.log('Unexpected response:', raw);
+      }
+    } catch (err) {
+      showError('Could not reach the API. Check the endpoint URL and that CORS is enabled on the route.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+    }
+  });
+</script>
+</body>
+</html>
