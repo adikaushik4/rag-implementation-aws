@@ -1,0 +1,427 @@
+{
+  "roleName": "rag-func-1-role-wqzuc69l",
+  "policies": [
+    {
+      "type": "inline",
+      "name": "bedrock-invoke-policy",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Action": "bedrock:InvokeModel",
+            "Resource": [
+              "arn:aws:bedrock:ap-south-1::foundation-model/amazon.titan-embed-text-v2:0",
+              "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0",
+              "arn:aws:bedrock:ap-south-1:146041104928:inference-profile/apac.amazon.nova-lite-v1:0"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "inline",
+      "name": "LambdaS3ReadAuroraEmbeddings",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "AllowS3GetObject",
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::aurora-embeddings/*"
+          },
+          {
+            "Sid": "AllowBedrockInvokeModel",
+            "Effect": "Allow",
+            "Action": [
+              "bedrock:InvokeModel"
+            ],
+            "Resource": "arn:aws:bedrock:ap-south-1::foundation-model/amazon.titan-embed-text-v2:0"
+          }
+        ]
+      }
+    },
+    {
+      "type": "inline",
+      "name": "marketplace-policy",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "aws-marketplace:Subscribe",
+              "aws-marketplace:Unsubscribe",
+              "aws-marketplace:ViewSubscriptions"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    {
+      "type": "inline",
+      "name": "s3-list-get-bucket",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::aurora-embeddings"
+          },
+          {
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::aurora-embeddings/*"
+          }
+        ]
+      }
+    },
+    {
+      "type": "managed",
+      "name": "AWSLambdaBasicExecutionRole-a0cdd133-540b-4ba9-be73-fcc826116ed4",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:ap-south-1:146041104928:*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": [
+              "arn:aws:logs:ap-south-1:146041104928:log-group:/aws/lambda/rag-func-1:*"
+            ]
+          }
+        ]
+      },
+      "arn": "arn:aws:iam::146041104928:policy/service-role/AWSLambdaBasicExecutionRole-a0cdd133-540b-4ba9-be73-fcc826116ed4",
+      "id": "ANPASEAF2NIQL5MNOAKQF"
+    },
+    {
+      "type": "managed",
+      "name": "AWSLambdaVPCAccessExecutionRole",
+      "document": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "AWSLambdaVPCAccessExecutionPermissions",
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "ec2:CreateNetworkInterface",
+              "ec2:DescribeNetworkInterfaces",
+              "ec2:DescribeSubnets",
+              "ec2:DeleteNetworkInterface",
+              "ec2:AssignPrivateIpAddresses",
+              "ec2:UnassignPrivateIpAddresses"
+            ],
+            "Resource": "*"
+          }
+        ]
+      },
+      "arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+      "id": "ANPAJVTME3YLVNL72YR2K"
+    }
+  ],
+  "trustedEntities": [
+    "lambda.amazonaws.com"
+  ],
+  "resources": {
+    "bedrock": {
+      "service": {
+        "name": "Amazon Bedrock",
+        "icon": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw"
+      },
+      "statements": [
+        {
+          "service": "bedrock",
+          "effect": "Allow",
+          "action": "bedrock:InvokeModel",
+          "resource": "arn:aws:bedrock:ap-south-1::foundation-model/amazon.titan-embed-text-v2:0",
+          "source": {
+            "policyName": "bedrock-invoke-policy",
+            "policyType": "inline",
+            "index": "Statement1"
+          }
+        },
+        {
+          "service": "bedrock",
+          "effect": "Allow",
+          "action": "bedrock:InvokeModel",
+          "resource": "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0",
+          "source": {
+            "policyName": "bedrock-invoke-policy",
+            "policyType": "inline",
+            "index": "Statement1"
+          }
+        },
+        {
+          "service": "bedrock",
+          "effect": "Allow",
+          "action": "bedrock:InvokeModel",
+          "resource": "arn:aws:bedrock:ap-south-1:146041104928:inference-profile/apac.amazon.nova-lite-v1:0",
+          "source": {
+            "policyName": "bedrock-invoke-policy",
+            "policyType": "inline",
+            "index": "Statement1"
+          }
+        },
+        {
+          "service": "bedrock",
+          "effect": "Allow",
+          "action": "bedrock:InvokeModel",
+          "resource": "arn:aws:bedrock:ap-south-1::foundation-model/amazon.titan-embed-text-v2:0",
+          "source": {
+            "policyName": "LambdaS3ReadAuroraEmbeddings",
+            "policyType": "inline",
+            "index": "AllowBedrockInvokeModel"
+          }
+        }
+      ]
+    },
+    "s3": {
+      "service": {
+        "name": "Amazon S3",
+        "icon": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw"
+      },
+      "statements": [
+        {
+          "service": "s3",
+          "effect": "Allow",
+          "action": "s3:GetObject",
+          "resource": "arn:aws:s3:::aurora-embeddings/*",
+          "source": {
+            "policyName": "LambdaS3ReadAuroraEmbeddings",
+            "policyType": "inline",
+            "index": "AllowS3GetObject"
+          }
+        },
+        {
+          "service": "s3",
+          "effect": "Allow",
+          "action": "s3:ListBucket",
+          "resource": "arn:aws:s3:::aurora-embeddings",
+          "source": {
+            "policyName": "s3-list-get-bucket",
+            "policyType": "inline",
+            "index": "0"
+          }
+        },
+        {
+          "service": "s3",
+          "effect": "Allow",
+          "action": "s3:GetObject",
+          "resource": "arn:aws:s3:::aurora-embeddings/*",
+          "source": {
+            "policyName": "s3-list-get-bucket",
+            "policyType": "inline",
+            "index": "1"
+          }
+        }
+      ]
+    },
+    "aws-marketplace": {
+      "service": {
+        "name": "AWS Marketplace",
+        "icon": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw"
+      },
+      "statements": [
+        {
+          "service": "aws-marketplace",
+          "effect": "Allow",
+          "action": "aws-marketplace:Subscribe",
+          "resource": "*",
+          "source": {
+            "policyName": "marketplace-policy",
+            "policyType": "inline",
+            "index": "0"
+          }
+        },
+        {
+          "service": "aws-marketplace",
+          "effect": "Allow",
+          "action": "aws-marketplace:Unsubscribe",
+          "resource": "*",
+          "source": {
+            "policyName": "marketplace-policy",
+            "policyType": "inline",
+            "index": "0"
+          }
+        },
+        {
+          "service": "aws-marketplace",
+          "effect": "Allow",
+          "action": "aws-marketplace:ViewSubscriptions",
+          "resource": "*",
+          "source": {
+            "policyName": "marketplace-policy",
+            "policyType": "inline",
+            "index": "0"
+          }
+        }
+      ]
+    },
+    "logs": {
+      "service": {
+        "name": "Amazon CloudWatch Logs",
+        "icon": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw"
+      },
+      "statements": [
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:CreateLogGroup",
+          "resource": "arn:aws:logs:ap-south-1:146041104928:*",
+          "source": {
+            "policyName": "AWSLambdaBasicExecutionRole-a0cdd133-540b-4ba9-be73-fcc826116ed4",
+            "policyType": "managed",
+            "index": "0"
+          }
+        },
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:CreateLogStream",
+          "resource": "arn:aws:logs:ap-south-1:146041104928:log-group:/aws/lambda/rag-func-1:*",
+          "source": {
+            "policyName": "AWSLambdaBasicExecutionRole-a0cdd133-540b-4ba9-be73-fcc826116ed4",
+            "policyType": "managed",
+            "index": "1"
+          }
+        },
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:PutLogEvents",
+          "resource": "arn:aws:logs:ap-south-1:146041104928:log-group:/aws/lambda/rag-func-1:*",
+          "source": {
+            "policyName": "AWSLambdaBasicExecutionRole-a0cdd133-540b-4ba9-be73-fcc826116ed4",
+            "policyType": "managed",
+            "index": "1"
+          }
+        },
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:CreateLogGroup",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:CreateLogStream",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "logs",
+          "effect": "Allow",
+          "action": "logs:PutLogEvents",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        }
+      ]
+    },
+    "ec2": {
+      "service": {
+        "name": "Amazon EC2",
+        "icon": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw"
+      },
+      "statements": [
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:CreateNetworkInterface",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:DescribeNetworkInterfaces",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:DescribeSubnets",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:DeleteNetworkInterface",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:AssignPrivateIpAddresses",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        },
+        {
+          "service": "ec2",
+          "effect": "Allow",
+          "action": "ec2:UnassignPrivateIpAddresses",
+          "resource": "*",
+          "source": {
+            "policyName": "AWSLambdaVPCAccessExecutionRole",
+            "policyType": "managed",
+            "index": "AWSLambdaVPCAccessExecutionPermissions"
+          }
+        }
+      ]
+    }
+  },
+  "partial": false
+}
