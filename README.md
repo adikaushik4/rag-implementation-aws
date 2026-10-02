@@ -57,6 +57,7 @@ DAY3:
 | Bastion lifecycle | Terminated after schema setup | Not needed for runtime traffic (Lambda ↔ RDS is direct via security groups); avoids paying for idle EC2 |
 
 ### Known limitations
+<img width="2720" height="1936" alt="rag_ingestion_flow" src="https://github.com/user-attachments/assets/c05c5c23-80bc-4e06-abfb-949f4fe26671" />
 
 Day 4:
 ## Day 4 — Bedrock VPC Connectivity & Ingestion Pipeline Complete
@@ -129,6 +130,8 @@ day 6
 - Built and deployed a front end: a single-page HTML/CSS/JS interface with a configurable API endpoint field, loading state, and source citations displayed per answer
 - Hosted the front end on **S3 static website hosting** (`my-rag-frontend-bckt`) with a public bucket read policy — keeping the entire stack, front end included, inside the same AWS project
 - Verified end-to-end behavior against real questions, including confirming that off-corpus questions (e.g. a nonexistent "Pilot Eye" strategy) correctly return "I don't know" rather than a hallucinated answer
+
+<img width="2720" height="1936" alt="rag_query_flow" src="https://github.com/user-attachments/assets/36cd7e98-2c2f-474a-923b-4adb33928278" />
 
 ### Key tradeoffs / decisions
 | Decision | Choice | Why |
