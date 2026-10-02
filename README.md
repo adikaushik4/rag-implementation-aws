@@ -1,6 +1,30 @@
 # rag-implementation-aws
 Created a RAG pipeline from Scratch using AWS. PDF ingestion, chunking, embeddings, pgvector storage, semantic retrieval, public API → hosted front end.
-day 1 -- day 2
+## Day 1–2 — Core Infrastructure Setup
+
+### What was built
+- Created a new VPC from scratch, with private subnets to host RDS and the Lambda functions that would need to reach it
+- Chose **RDS (PostgreSQL)** for the vector store, driven by the free-tier constraint — which meant Lambda would need to run inside the VPC to reach it, since a free-tier RDS instance shouldn't be publicly accessible
+- Created an **S3 bucket** and uploaded the source PDFs that would later be ingested
+- Created an **S3 Gateway endpoint** and associated it with the route tables used by the private subnets — required since a Lambda sitting in a private subnet has no internet route to S3 otherwise, and gateway endpoints are free
+- Created the ingestion Lambda's **execution role** with S3 access, and attached the Lambda to the VPC (private subnets + security group)
+
+### Key tradeoffs / decisions
+| Decision | Choice | Why |
+|---|---|---|
+| Vector store | RDS PostgreSQL (with pgvector planned) over OpenSearch | Free-tier eligible; OpenSearch Serverless has no comparable free tier |
+| RDS network exposure | Private subnets, no public access | Security best practice regardless of free tier — RDS should never be internet-facing by default |
+| Consequence of a private RDS | Lambda must run inside the VPC | The only way for Lambda to reach a non-public RDS instance; accepted as a necessary tradeoff despite the networking complexity it introduces (VPC endpoints, security groups) for later steps |
+| S3 access from a VPC-attached Lambda | Gateway endpoint, not a NAT Gateway | Free, and sufficient for S3/DynamoDB specifically — a NAT Gateway would have been a recurring cost for a need the gateway endpoint already covers |
+
+### Known limitations at this stage
+- Database not yet created — VPC and networking groundwork laid, but RDS instance, pgvector extension, and schema still to come
+- No path yet established for the Lambda to reach anything *other* than S3 (Bedrock, in particular) from inside the VPC — gateway endpoints only cover S3 and DynamoDB, so this was flagged as the next thing to solve rather than an afterthought
+
+### Outcome
+Networking foundation in place: VPC, private subnets, S3 with source data, gateway endpoint, and a Lambda correctly positioned inside the VPC with S3 access. Next: provision RDS, enable pgvector, and solve Bedrock reachability from inside the VPC (interface endpoint) — see Day 3 onward.
+
+
 DAY3:
 ## Day 2-3 — Vector Store Setup & Ingestion Pipeline
 
