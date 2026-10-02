@@ -62,6 +62,9 @@ Day 4:
 - Chunking is naive (word count, not sentence/paragraph aware) — acceptable for now, a candidate for later refinement
 - Credentials via env vars are fine for a portfolio project but wouldn't be production-appropriate as-is
 
+<img width="2816" height="1536" alt="pdf_ingestion" src="https://github.com/user-attachments/assets/edbc5586-1eed-44f3-8003-aa70fcd65db8" />
+
+
 day 5
 ## Day 5 — Generation, Model Access Troubleshooting & API Gateway
 
@@ -119,3 +122,5 @@ day 6
 
 ### Outcome
 End-to-end RAG pipeline live and working: PDF ingestion → chunking → embeddings → pgvector storage → semantic retrieval → grounded generation → public API → hosted front end. Project considered complete.
+<img width="2816" height="1536" alt="query_path" src="https://github.com/user-attachments/assets/f26c84ee-3e79-4371-9f86-869603dc2fef" />
+
